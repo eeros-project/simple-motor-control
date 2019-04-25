@@ -1,12 +1,12 @@
-#ifndef ORG_EEROS_EXAMPLES_SEQUENCER_MAINSEQUENCE_HPP_
-#define ORG_EEROS_EXAMPLES_SEQUENCER_MAINSEQUENCE_HPP_
+#ifndef MAINSEQUENCE_HPP_
+#define MAINSEQUENCE_HPP_
 
 #include <eeros/sequencer/Sequencer.hpp>
 #include <eeros/sequencer/Sequence.hpp>
 #include <eeros/sequencer/Step.hpp>
 #include <eeros/safety/SafetySystem.hpp>
-#include "MySafetyProperties.hpp"
-#include "MyControlSystem.hpp"
+#include "SMCSafetyProperties.hpp"
+#include "ControlSystem.hpp"
 #include <unistd.h>
 
 using namespace eeros::sequencer;
@@ -15,18 +15,18 @@ using namespace eeros::logger;
 
 class Move : public Step {
 public:
-	Move(std::string name, Sequence* caller, MyControlSystem& cs) : Step(name, caller), cs(cs) { }
+	Move(std::string name, Sequence* caller, ControlSystem& cs) : Step(name, caller), cs(cs) { }
 	int operator() (double pos) {this->pos = pos; return start();}
 	int action() {
 		cs.setpoint.setValue(pos);
 	}
 	double pos;
-	MyControlSystem& cs;
+	ControlSystem& cs;
 };
 
 class MainSequence : public Sequence {
 public:
-	MainSequence(std::string name, Sequencer& seq, SafetySystem& safetySys, MySafetyProperties& safetyProp, MyControlSystem& cs, double angle) : 
+	MainSequence(std::string name, Sequencer& seq, SafetySystem& safetySys, SMCSafetyProperties& safetyProp, ControlSystem& cs, double angle) : 
 					Sequence(name, seq), safetySys(safetySys), safetyProp(safetyProp), angle(angle), controlSys(cs), move("move", this, cs) {
 		log.info() << "Sequence created: " << name;
 	}
@@ -45,8 +45,8 @@ private:
 	Move move;
 	double angle;
 	SafetySystem& safetySys;
-	MyControlSystem& controlSys;
-	MySafetyProperties& safetyProp;
+	ControlSystem& controlSys;
+	SMCSafetyProperties& safetyProp;
 };
 
-#endif // ORG_EEROS_EXAMPLES_SEQUENCER_MAINSEQUENCE_HPP_ 
+#endif // MAINSEQUENCE_HPP_ 

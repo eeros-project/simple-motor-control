@@ -10,8 +10,8 @@
 #include <eeros/safety/SafetySystem.hpp>
 #include <eeros/logger/StreamLogWriter.hpp>
 #include <eeros/sequencer/Sequencer.hpp>
-#include "MySafetyProperties.hpp"
-#include "MyControlSystem.hpp"
+#include "SMCSafetyProperties.hpp"
+#include "ControlSystem.hpp"
 #include "MainSequence.hpp"
 
 using namespace eeros;
@@ -43,10 +43,10 @@ int main(int argc, char **argv) {
 	hal.readConfigFromFile(&argc, argv);
 	
 	// Create the control system
-	MyControlSystem controlSys(dt);
+	ControlSystem controlSys(dt);
 	
 	// Create and initialize a safety system
-	MySafetyProperties properties(controlSys, dt);
+	SMCSafetyProperties properties(controlSys, dt);
 	SafetySystem safetySys(properties, dt);
 	controlSys.timedomain.registerSafetyEvent(safetySys, properties.doEmergency);
 	

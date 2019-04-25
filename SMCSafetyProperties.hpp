@@ -1,15 +1,15 @@
-#ifndef MYSAFETYPROPERTIES_HPP_
-#define MYSAFETYPROPERTIES_HPP_
+#ifndef SMCSAFETYPROPERTIES_HPP_
+#define SMCSAFETYPROPERTIES_HPP_
 
 #include <eeros/safety/SafetyProperties.hpp>
 #include <eeros/hal/HAL.hpp>
-#include "MyControlSystem.hpp"
+#include "ControlSystem.hpp"
 
-class MySafetyProperties : public eeros::safety::SafetyProperties {
+class SMCSafetyProperties : public eeros::safety::SafetyProperties {
 	
 public:
-	MySafetyProperties(MyControlSystem& controlSys, double ts);
-	virtual ~MySafetyProperties();
+	SMCSafetyProperties(ControlSystem& controlSys, double ts);
+	virtual ~SMCSafetyProperties();
 	
 	// Define all possible events
 	eeros::safety::SafetyEvent doSystemOn;
@@ -41,7 +41,7 @@ protected:
 	eeros::hal::Input<bool>* emergency;
 	eeros::hal::Input<bool>* ready;
 		
-	MyControlSystem& controlSys;
+	ControlSystem& controlSys;
 };
 
-#endif // MYSAFETYPROPERTIES_HPP_
+#endif // SMCSAFETYPROPERTIES_HPP_

@@ -3,7 +3,7 @@
 
 using namespace eeros::control;
 
-MyControlSystem::MyControlSystem(double ts) : 
+ControlSystem::ControlSystem(double ts) : 
 	setpoint(0.0),
 	enc("q"),
 	posController(174.5),
@@ -62,4 +62,4 @@ MyControlSystem::MyControlSystem(double ts) :
 	eeros::Executor::instance().add(timedomain);
 }
 
-MyControlSystem::~MyControlSystem() { }
+ControlSystem::~ControlSystem() { }

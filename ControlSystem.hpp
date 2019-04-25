@@ -1,5 +1,5 @@
-#ifndef MYCONTROLSYSTEM_HPP_
-#define MYCONTROLSYSTEM_HPP_
+#ifndef CONTROLSYSTEM_HPP_
+#define CONTROLSYSTEM_HPP_
 
 #include <eeros/control/Sum.hpp>
 #include <eeros/control/D.hpp>
@@ -9,11 +9,11 @@
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/TimeDomain.hpp>
 
-class MyControlSystem {
+class ControlSystem {
 
 public:
-	MyControlSystem(double ts);
-	~MyControlSystem();
+	ControlSystem(double ts);
+	~ControlSystem();
 	
 	eeros::control::Constant<> setpoint;
 	eeros::control::PeripheralInput<double> enc;
@@ -30,4 +30,4 @@ public:
 	eeros::control::TimeDomain timedomain;
 };
 
-#endif // MYCONTROLSYSTEM_HPP_
+#endif // CONTROLSYSTEM_HPP_

@@ -1,5 +1,5 @@
-#include "MySafetyProperties.hpp"
-#include "MyControlSystem.hpp"
+#include "SMCSafetyProperties.hpp"
+#include "ControlSystem.hpp"
 
 #include <eeros/hal/HAL.hpp>
 #include <eeros/safety/InputAction.hpp>
@@ -15,7 +15,7 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 
-MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double dt) : 
+SMCSafetyProperties::SMCSafetyProperties(ControlSystem& controlSys, double dt) : 
 	controlSys(controlSys),
 	// ############ Define Levels ############
 	slOff("Software is off"),
@@ -127,4 +127,4 @@ MySafetyProperties::MySafetyProperties(MyControlSystem& controlSys, double dt) :
 	
 }
 
-MySafetyProperties::~MySafetyProperties() { }
+SMCSafetyProperties::~SMCSafetyProperties() { }
