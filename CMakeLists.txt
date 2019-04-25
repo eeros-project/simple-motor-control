@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.1)
 
-project(simple-motor-control)
+project(simpleMotorControl)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -27,5 +27,5 @@ link_directories(${EEROS_LIB_DIR};${EEROS_LIBUCL_LINK_DIR})
 
 add_custom_command(OUTPUT copyHalConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${simple-motor-control_SOURCE_DIR}/*.json" "${simple-motor-control_BINARY_DIR}")
  
-add_executable(simple-motor-control SimpleMotorControl.cpp ControlSystem.cpp SMCSafetyProperties.cpp copyHalConfig)
-target_link_libraries(simple-motor-control eeros ucl ${CMAKE_DL_LIBS})
+add_executable(simpleMotorControl SimpleMotorControl.cpp ControlSystem.cpp SMCSafetyProperties.cpp copyHalConfig)
+target_link_libraries(simpleMotorControl eeros ucl ${CMAKE_DL_LIBS})
