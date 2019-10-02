@@ -4,6 +4,9 @@
 # This module provides functions that simplify
 # versioning of libraries and dependency management.
 #
+# Dependencies:
+# * MunkeiVersionFromGit.cmake
+#
 
 cmake_minimum_required(VERSION 3.5.1)
 
@@ -24,18 +27,13 @@ endfunction(log string)
 #
 # Fetches the version information from git and sets the following global variables:
 # LIBRARY_VERSION
-# VERSION_MAJOR
-# VERSION_MINOR
-# VERSION_PATCH
-# VERSION_TWEAK
 #
 # Usage: setLibraryVersion()
 #
 function(setLibraryVersion)
-  include(MunkeiVersionFromGit.cmake)
+  include(cmake/MunkeiVersionFromGit.cmake)
   version_from_git()
-  set(LIBRARY_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.
-      ${VERSION_PATCH}.${VERSION_TWEAK})
+  set(LIBRARY_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}" PARENT_SCOPE)
 endfunction(setLibraryVersion)
 
 
@@ -51,25 +49,22 @@ endfunction(setLibraryVersion)
 # includeInstallDir - the path of the include directory, relative to the root install dir
 # libInstallDir     - the path of the lib directory, relative to the root install dir
 #
-# Sets the following global variables:
-# INCLUDE_INSTALL_DIR
-# LIB_INSTALL_DIR
 #
 # Usage: createPackageFiles("MyProjectConfig.cmake.in" "/include" "/lib")
 #
 function(createPackageFiles inFileName includeInstallDir libInstallDir)
-  set(INCLUDE_INSTALL_DIR ${includeInstallDir} PARENT_SCOPE)
-  set(LIB_INSTALL_DIR ${libInstallDir} PARENT_SCOPE)
+  set(INCLUDE_INSTALL_DIR ${includeInstallDir})
+  set(LIB_INSTALL_DIR ${libInstallDir})
 
   include(CMakePackageConfigHelpers)
 
-  configure_package_config_file(cmake/${inFileName}
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    INSTALL_DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
+  configure_package_config_file("cmake/${inFileName}"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION "${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake"
     PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR)
 
   write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
     VERSION ${LIBRARY_VERSION}
     COMPATIBILITY ExactVersion)
 
@@ -105,17 +100,17 @@ function(setVersionToFind modulename variablename recommendedVersion)
        "^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)$")
 
     log("${variablename} variable was not set or is no valid version number")
-    set(VERSION_TO_FIND ${recommendedVersion} PARENT_SCOPE)
     log("Using recommended ${modulename} version, which is: v${recommendedVersion}")
+    set(VERSION_TO_FIND ${recommendedVersion} PARENT_SCOPE)
 
   else()
     set(requiredVersion ${ARGV3})
 
     if(NOT ${requiredVersion} VERSION_EQUAL ${recommendedVersion})
       log("You are not using the recommended ${modulename} version, which would be: v${recommendedVersion}")
-      set(VERSION_TO_FIND ${requiredVersion} PARENT_SCOPE)
-    endif(NOT ${requiredVersion} VERSION_EQUAL ${recommendedVersion})
+    endif()
 
+    set(VERSION_TO_FIND ${requiredVersion} PARENT_SCOPE)
   endif()
 endfunction(setVersionToFind requiredVersion recommendedVersion modulename)
 
