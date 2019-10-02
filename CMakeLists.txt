@@ -4,28 +4,69 @@ project(simpleMotorControl)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(RECOMMENDED_EEROS_VERSION 1.0.0.0)
 
-if(NOT DEFINED REQUIRED_EEROS_VERSION OR
-   NOT REQUIRED_EEROS_VERSION MATCHES
-       "^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)$")
+set(RECOMMENDED_EEROS_VERSION 1.0.0.48)
+set(RECOMMENDED_SIM_EEROS_VERSION 1.0.0.0)
+set(RECOMMENDED_FLINKLIB_VERSION 1.0.0.0)
+set(RECOMMENDED_FLINK_EEROS_VERSION 1.0.0.0)
+set(RECOMMENDED_COMEDI_EEROS_VERSION 1.0.0.0)
+set(RECOMMENDED_ROS_EEROS_VERSION 1.0.0.0)
 
-  set(REQUIRED_EEROS_VERSION ${RECOMMENDED_EEROS_VERSION})
-  message("Using recommended EEROS version, which is: v${REQUIRED_EEROS_VERSION}")
 
-else()
-  if(NOT ${REQUIRED_EEROS_VERSION} EQUAL ${RECOMMENDED_EEROS_VERSION})
-     message("You are not using the recommended EEROS version, "
-             "which would be: v${RECOMMENDED_EEROS_VERSION}")
-  endif(NOT ${REQUIRED_EEROS_VERSION} EQUAL ${RECOMMENDED_EEROS_VERSION})
+if(CMAKE_BUILD_TYPE MATCHES "Debug|DEBUG")
+	set(LOGGER ON)
 endif()
 
-find_package(EEROS ${REQUIRED_EEROS_VERSION} REQUIRED)
- 
+
+include(cmake/versionCheckHelpers.cmake)
+
+# Find EEROS
+setVersionToFind("EEROS" "REQUIRED_EEROS_VERSION" ${RECOMMENDED_EEROS_VERSION} ${REQUIRED_EEROS_VERSION})
+find_package(EEROS ${VERSION_TO_FIND} EXACT)
+checkIfModuleFound("EEROS" "REQUIRED_EEROS_VERSION")
+
+
+# Find Simulator
+if(USE_SIM)
+  setVersionToFind("sim-eeros" "REQUIRED_SIM_EEROS_VERSION" ${RECOMMENDED_SIM_EEROS_VERSION} ${REQUIRED_SIM_EEROS_VERSION})
+  find_package(sim-eeros ${VERSION_TO_FIND} EXACT)
+  checkIfModuleFound("sim-eeros" "REQUIRED_SIM_EEROS_VERSION")
+endif(USE_SIM)
+
+
+# Find Flink
+if(USE_FLINK)
+  setVersionToFind("flinklib" "REQUIRED_FLINKLIB_VERSION" ${RECOMMENDED_FLINKLIB_VERSION} ${REQUIRED_FLINKLIB_VERSION})
+  find_package(sim-eeros ${VERSION_TO_FIND} EXACT)
+  checkIfModuleFound("flinklib" "REQUIRED_FLINKLIB_VERSION")
+
+  setVersionToFind("flink-eeros" "REQUIRED_FLINK_EEROS_VERSION" ${RECOMMENDED_FLINK_EEROS_VERSION} ${REQUIRED_FLINK_EEROS_VERSION})
+  find_package(sim-eeros ${VERSION_TO_FIND} EXACT)
+  checkIfModuleFound("flink-eeros" "REQUIRED_FLINK_EEROS_VERSION")
+endif(USE_FLINK)
+
+
+# Find Comedi
+if(USE_COMEDI)
+  setVersionToFind("comedi-eeros" "REQUIRED_COMEDI_EEROS_VERSION" ${RECOMMENDED_COMEDI_EEROS_VERSION} ${REQUIRED_COMEDI_EEROS_VERSION})
+  find_package(sim-eeros ${VERSION_TO_FIND} EXACT)
+  checkIfModuleFound("comedi-eeros" "REQUIRED_COMEDI_EEROS_VERSION")
+endif(USE_COMEDI)
+
+
+# Find ROS
+if(USE_ROS)
+  setVersionToFind("ros-eeros" "REQUIRED_ROS_EEROS_VERSION" ${RECOMMENDED_ROS_EEROS_VERSION} ${REQUIRED_ROS_EEROS_VERSION})
+  find_package(sim-eeros ${VERSION_TO_FIND} EXACT)
+  checkIfModuleFound("ros-eeros" "REQUIRED_ROS_EEROS_VERSION")
+endif(USE_ROS)
+
+
 include_directories(${EEROS_INCLUDE_DIR};${EEROS_LIBUCL_INCLUDE_DIR})
 link_directories(${EEROS_LIB_DIR};${EEROS_LIBUCL_LINK_DIR})
 
 add_custom_command(OUTPUT copyHalConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${simpleMotorControl_SOURCE_DIR}/*.json" "${simpleMotorControl_BINARY_DIR}")
- 
+
 add_executable(simpleMotorControl SimpleMotorControl.cpp ControlSystem.cpp SMCSafetyProperties.cpp copyHalConfig)
 target_link_libraries(simpleMotorControl eeros ucl ${CMAKE_DL_LIBS})
+
