@@ -33,7 +33,7 @@ public:
 	eeros::safety::SafetyLevel slPowerOn;
 	eeros::safety::SafetyLevel slMoving;
 	
-protected:
+private:
 	// critical outputs
 	eeros::hal::Output<bool>* enable;
 	
@@ -41,7 +41,7 @@ protected:
 	eeros::hal::Input<bool>* emergency;
 	eeros::hal::Input<bool>* ready;
 		
-	ControlSystem& controlSys;
+	ControlSystem& cs;
 };
 
 #endif // SMCSAFETYPROPERTIES_HPP_

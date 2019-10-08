@@ -36,9 +36,10 @@ endif(USE_SIM)
 
 # Find Flink
 if(USE_FLINK)
-  setVersionToFind("flinklib" "REQUIRED_FLINKLIB_VERSION" ${RECOMMENDED_FLINKLIB_VERSION} ${REQUIRED_FLINKLIB_VERSION})
-  find_package(flinklib ${VERSION_TO_FIND} EXACT)
-  checkIfModuleFound("flinklib" "REQUIRED_FLINKLIB_VERSION")
+#  setVersionToFind("flinklib" "REQUIRED_FLINKLIB_VERSION" ${RECOMMENDED_FLINKLIB_VERSION} ${REQUIRED_FLINKLIB_VERSION})
+#  find_package(flinklib ${VERSION_TO_FIND} EXACT)
+  find_package(flink)
+#  checkIfModuleFound("flinklib" "REQUIRED_FLINKLIB_VERSION")
 
   setVersionToFind("flink-eeros" "REQUIRED_FLINK_EEROS_VERSION" ${RECOMMENDED_FLINK_EEROS_VERSION} ${REQUIRED_FLINK_EEROS_VERSION})
   find_package(flink-eeros ${VERSION_TO_FIND} EXACT)

@@ -1,37 +1,32 @@
 #include "ControlSystem.hpp"
 #include <eeros/core/Executor.hpp>
+#include <math.h>
 
 using namespace eeros::control;
+
+const double dampingFactor = 0.9;
 
 ControlSystem::ControlSystem(double ts) : 
 	setpoint(0.0),
 	enc("q"),
-	posController(174.5),
-	speedController(565.48),
+	posController(2 * M_PI / (ts * 20) / (2 * dampingFactor)),	// 174.5
+	speedController(2 * M_PI / (ts * 20) * 2 * dampingFactor),	//565.48
 	inertia(9.49e-7),
 	invMotConst(1/16.3e-3),
 	dac("dac"),
 	timedomain("Main time domain", ts, true) {
 	
 	setpoint.getOut().getSignal().setName("phi_desired");
-
 	enc.getOut().getSignal().setName("phi_actual");
-
 	diff1.getOut().getSignal().setName("phi_d_actual");
 	sum1.negateInput(1);
-	sum1.getOut().getSignal().setName("phi_e");
-	
+	sum1.getOut().getSignal().setName("phi_e");	
 	posController.getOut().getSignal().setName("phi_d_set");
-	
 	diff2.getOut().getSignal().setName("phi_d_set_ff");
-	
 	sum2.negateInput(1);
 	sum2.getOut().getSignal().setName("phi_d_e");
-	
 	speedController.getOut().getSignal().setName("phi_dd_set");
-
 	inertia.getOut().getSignal().setName("M");
-
 	invMotConst.getOut().getSignal().setName("i");
 	
 	diff1.getIn().connect(enc.getOut());
@@ -57,7 +52,7 @@ ControlSystem::ControlSystem(double ts) :
 	timedomain.addBlock(speedController);
 	timedomain.addBlock(inertia);
 	timedomain.addBlock(invMotConst);
-	timedomain.addBlock(dac);
+	timedomain.addBlock(dac); 
 
 	eeros::Executor::instance().add(timedomain);
 }

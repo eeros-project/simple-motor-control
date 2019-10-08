@@ -15,9 +15,8 @@ using namespace eeros;
 using namespace eeros::hal;
 using namespace eeros::safety;
 
-SMCSafetyProperties::SMCSafetyProperties(ControlSystem& controlSys, double dt) : 
-	controlSys(controlSys),
-	// ############ Define Levels ############
+SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt) : 
+	cs(cs),
 	slOff("Software is off"),
 	slEmergency("Emergency state"),
 	slSystemOn("System is ready, power off"),
@@ -73,21 +72,21 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& controlSys, double dt) :
 	addEventToLevelAndAbove(slEmergency, abort, slStoppingControl, kPublicEvent);
 		
 	// ############ Define input states and events for all levels ############
-	slOff			.setInputActions( { ignore(emergency), ignore(ready) });
-	slEmergency		.setInputActions( { ignore(emergency), ignore(ready) });
-	slSystemOn		.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
-	slStartingControl	.setInputActions( { check(emergency, true , doEmergency), ignore(ready)});
-	slStoppingControl	.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
-	slPowerOn		.setInputActions( { check(emergency, true , doEmergency), ignore(ready) });
-	slMoving		.setInputActions( { check(emergency, true , doEmergency), check(ready, true, doEmergency) });
+	slOff			.setInputActions({ignore(emergency), ignore(ready)});
+	slEmergency		.setInputActions({ignore(emergency), ignore(ready)});
+	slSystemOn		.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+	slStartingControl	.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+	slStoppingControl	.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+	slPowerOn		.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+	slMoving		.setInputActions({check(emergency, false, doEmergency), check(ready, true, doEmergency)});
 	
-	slOff			.setOutputActions( { set(enable, false) } );;
-	slEmergency		.setOutputActions( { set(enable, false) } );;
-	slSystemOn		.setOutputActions( { set(enable, false) } );;
-	slStartingControl	.setOutputActions( { set(enable, false) } );;
-	slStoppingControl	.setOutputActions( { set(enable, false) } );;
-	slPowerOn		.setOutputActions( { set(enable, true) } );;
-	slMoving		.setOutputActions( { set(enable, true) } );;
+	slOff			.setOutputActions({set(enable, false)});
+	slEmergency		.setOutputActions({set(enable, false)});
+	slSystemOn		.setOutputActions({set(enable, false)});
+	slStartingControl	.setOutputActions({set(enable, false)});
+	slStoppingControl	.setOutputActions({set(enable, false)});
+	slPowerOn		.setOutputActions({set(enable, true)});
+	slMoving		.setOutputActions({set(enable, true)});
 	
 	// Define and add level functions
 	slOff.setLevelAction([&](SafetyContext* privateContext) {
@@ -95,25 +94,25 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& controlSys, double dt) :
 	});
 	
 	slSystemOn.setLevelAction([&](SafetyContext* privateContext) {
-		controlSys.timedomain.stop();
+		cs.timedomain.stop();
 		// you may want to check here for a user input
 		privateContext->triggerEvent(startControl); 
 	});
 	
 	slStartingControl.setLevelAction([&,dt](SafetyContext* privateContext) {
-		controlSys.timedomain.start();
-		if(slStartingControl.getNofActivations() * dt > 2){	// wait 2s
+		cs.timedomain.start();
+		if(slStartingControl.getNofActivations() * dt > 5) {	// wait 5s
 			privateContext->triggerEvent(startControlDone);
 		}
 	});
 	
 	slStoppingControl.setLevelAction([&](SafetyContext* privateContext) {
-		controlSys.timedomain.stop();
+		cs.timedomain.stop();
 		privateContext->triggerEvent(stopControlDone);
 	});
 	
 	slPowerOn.setLevelAction([&](SafetyContext* privateContext) {
-		if(ready->get()){	// check if drive is ready
+		if(ready->get()) {	// check if drive is ready
 			privateContext->triggerEvent(startMoving);
 		}
 	});

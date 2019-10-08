@@ -27,26 +27,25 @@ public:
 class MainSequence : public Sequence {
 public:
 	MainSequence(std::string name, Sequencer& seq, SafetySystem& safetySys, SMCSafetyProperties& safetyProp, ControlSystem& cs, double angle) : 
-					Sequence(name, seq), safetySys(safetySys), safetyProp(safetyProp), angle(angle), controlSys(cs), move("move", this, cs) {
+					Sequence(name, seq), ss(safetySys), sp(safetyProp), angle(angle), cs(cs), move("move", this, cs) {
 		log.info() << "Sequence created: " << name;
 	}
 	int action() {
-		while(safetySys.getCurrentLevel() < safetyProp.slMoving);
-	
+		while(Sequencer::running && ss.getCurrentLevel() < sp.slMoving);
 		angle = 0;
 		while (Sequencer::running) {
 			angle += 6.28 / 10;
 			move(angle);
 			sleep(1);
-			log.info() << "enc =  " << controlSys.enc.getOut().getSignal().getValue();
+			log.info() << "pos =  " << cs.enc.getOut().getSignal().getValue();
 		}
 	}
 private:
 	Move move;
 	double angle;
-	SafetySystem& safetySys;
-	ControlSystem& controlSys;
-	SMCSafetyProperties& safetyProp;
+	SafetySystem& ss;
+	ControlSystem& cs;
+	SMCSafetyProperties& sp;
 };
 
 #endif // MAINSEQUENCE_HPP_ 
