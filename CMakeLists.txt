@@ -50,9 +50,9 @@ endif(USE_FLINK)
 
 # Find BBBlueEEROS
 if(USE_BBBLUE)
-  setVersionToFind("bbblueeeros" "REQUIRED_BBBLUE_EEROS_VERSION" ${RECOMMENDED_BBBLUE_EEROS_VERSION} ${REQUIRED_BBBLUE_EEROS_VERSION})
-  find_package(bbblueeeros ${VERSION_TO_FIND} EXACT)
-  checkIfModuleFound("bbblueeeros" "REQUIRED_BBBLUE_EEROS_VERSION")
+  setVersionToFind("bbblue-eeros" "REQUIRED_BBBLUE_EEROS_VERSION" ${RECOMMENDED_BBBLUE_EEROS_VERSION} ${REQUIRED_BBBLUE_EEROS_VERSION})
+  find_package(bbblue-eeros ${VERSION_TO_FIND} EXACT)
+  checkIfModuleFound("bbblue-eeros" "REQUIRED_BBBLUE_EEROS_VERSION")
 endif(USE_BBBLUE)
 
 
