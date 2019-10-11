@@ -93,6 +93,12 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt) :
 		Executor::stop();
 	});
 	
+	slEmergency.setLevelAction([&](SafetyContext* privateContext) {
+		if(!emergency->get()) {	// check if still pressed
+			privateContext->triggerEvent(resetEmergency); 
+		}
+	});
+	
 	slSystemOn.setLevelAction([&](SafetyContext* privateContext) {
 		cs.timedomain.stop();
 		// you may want to check here for a user input
