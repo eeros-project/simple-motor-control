@@ -68,8 +68,8 @@ if(USE_ROS)
 endif(USE_ROS)
 
 
-include_directories(${EEROS_INCLUDE_DIR};${EEROS_LIBUCL_INCLUDE_DIR})
-link_directories(${EEROS_LIB_DIR};${EEROS_LIBUCL_LINK_DIR})
+include_directories(${EEROS_INCLUDE_DIR})
+link_directories(${EEROS_LIB_DIR})
 
 add_custom_command(OUTPUT copyHalConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${simpleMotorControl_SOURCE_DIR}/*.json" "${simpleMotorControl_BINARY_DIR}")
 
