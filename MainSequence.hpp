@@ -19,6 +19,7 @@ public:
 	int operator() (double pos) {this->pos = pos; return start();}
 	int action() {
 		cs.setpoint.setValue(pos);
+		return 0;
 	}
 	double pos;
 	ControlSystem& cs;
@@ -39,6 +40,7 @@ public:
 			sleep(1);
 			log.info() << "pos =  " << cs.enc.getOut().getSignal().getValue();
 		}
+		return 0;
 	}
 private:
 	Move move;
