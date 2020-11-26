@@ -28,11 +28,10 @@ void signalHandler(int signum){
   Sequencer::instance().abort();
 }
 
-int main(int argc, char **argv) {
-  StreamLogWriter w(std::cout);
-  Logger::setDefaultWriter(&w);
-  Logger log;
-  w.show();
+int main(int argc, char **argv) {  
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
+  log.show();
   
   log.info() << "Simple Motor Controller Demo started...";
   
@@ -41,26 +40,24 @@ int main(int argc, char **argv) {
   hal.readConfigFromFile(&argc, argv);
   
   // Create the control system
-  ControlSystem controlSys(dt);
+  ControlSystem cs(dt);
   
   // Create and initialize a safety system
-  SMCSafetyProperties properties(controlSys, dt);
-  SafetySystem safetySys(properties, dt);
-  controlSys.timedomain.registerSafetyEvent(safetySys, properties.doEmergency);
+  SMCSafetyProperties sp(cs, dt);
+  SafetySystem ss(sp, dt);
+  cs.timedomain.registerSafetyEvent(ss, sp.doEmergency);
   signal(SIGINT, signalHandler);
-
+  
   auto& sequencer = Sequencer::instance();
-  MainSequence mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);
-  sequencer.addSequence(mainSequence);
-  mainSequence.start();
+  MainSequence mainSequence("Main Sequence", sequencer, ss, sp, cs, 3.14/10);
+  mainSequence();
   
   auto &executor = Executor::instance();
-  executor.setMainTask(safetySys);
-  safetySys.triggerEvent(properties.doSystemOn);
-  
+  executor.setMainTask(ss);
+  ss.triggerEvent(sp.doSystemOn);
   executor.run();
   
-  mainSequence.waitAndTerminate();
+  mainSequence.wait();
   log.info() << "Example finished...";
   return 0;
 }

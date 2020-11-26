@@ -9,25 +9,25 @@
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/TimeDomain.hpp>
 
+using namespace eeros::control;
+
 class ControlSystem {
+ public:
+  ControlSystem(double ts);
+  
+  Constant<> setpoint;
+  PeripheralInput<double> enc;
+  D<> diff1;
+  Sum<2> sum1;
+  Gain<> posController;
+  D<> diff2;
+  Sum<3> sum2;
+  Gain<> speedController;
+  Gain<> inertia;
+  Gain<> invMotConst;
+  PeripheralOutput<double> dac;
 
-public:
-	ControlSystem(double ts);
-	~ControlSystem();
-	
-	eeros::control::Constant<> setpoint;
-	eeros::control::PeripheralInput<double> enc;
-	eeros::control::D<> diff1;
-	eeros::control::Sum<2> sum1;
-	eeros::control::Gain<> posController;
-	eeros::control::D<> diff2;
-	eeros::control::Sum<3> sum2;
-	eeros::control::Gain<> speedController;
-	eeros::control::Gain<> inertia;
-	eeros::control::Gain<> invMotConst;
-	eeros::control::PeripheralOutput<double> dac;
-
-	eeros::control::TimeDomain timedomain;
+  TimeDomain timedomain;
 };
 
 #endif // CONTROLSYSTEM_HPP_

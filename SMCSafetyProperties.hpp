@@ -5,43 +5,44 @@
 #include <eeros/hal/HAL.hpp>
 #include "ControlSystem.hpp"
 
-class SMCSafetyProperties : public eeros::safety::SafetyProperties {
-	
-public:
-	SMCSafetyProperties(ControlSystem& controlSys, double ts);
-	virtual ~SMCSafetyProperties();
-	
-	// Define all possible events
-	eeros::safety::SafetyEvent doSystemOn;
-	eeros::safety::SafetyEvent doSystemOff;
-	eeros::safety::SafetyEvent startControl;
-	eeros::safety::SafetyEvent stopControl;
-	eeros::safety::SafetyEvent startControlDone;
-	eeros::safety::SafetyEvent stopControlDone;
-	eeros::safety::SafetyEvent startMoving;
-	eeros::safety::SafetyEvent stopMoving;
-	eeros::safety::SafetyEvent doEmergency;
-	eeros::safety::SafetyEvent resetEmergency;	
-	eeros::safety::SafetyEvent abort;
-	
-	// Name all levels
-	eeros::safety::SafetyLevel slOff;
-	eeros::safety::SafetyLevel slEmergency;
-	eeros::safety::SafetyLevel slSystemOn;
-	eeros::safety::SafetyLevel slStartingControl;
-	eeros::safety::SafetyLevel slStoppingControl;
-	eeros::safety::SafetyLevel slPowerOn;
-	eeros::safety::SafetyLevel slMoving;
-	
+using namespace eeros::safety;
+
+class SMCSafetyProperties : public SafetyProperties {
+  
+ public:
+  SMCSafetyProperties(ControlSystem& controlSys, double ts);
+  
+  // Define all possible events
+  SafetyEvent doSystemOn;
+  SafetyEvent doSystemOff;
+  SafetyEvent startControl;
+  SafetyEvent stopControl;
+  SafetyEvent startControlDone;
+  SafetyEvent stopControlDone;
+  SafetyEvent startMoving;
+  SafetyEvent stopMoving;
+  SafetyEvent doEmergency;
+  SafetyEvent resetEmergency;	
+  SafetyEvent abort;
+  
+  // Name all levels
+  SafetyLevel slOff;
+  SafetyLevel slEmergency;
+  SafetyLevel slSystemOn;
+  SafetyLevel slStartingControl;
+  SafetyLevel slStoppingControl;
+  SafetyLevel slPowerOn;
+  SafetyLevel slMoving;
+  
 private:
-	// critical outputs
-	eeros::hal::Output<bool>* enable;
-	
-	// critical inputs
-	eeros::hal::Input<bool>* emergency;
-	eeros::hal::Input<bool>* ready;
-		
-	ControlSystem& cs;
+  // critical outputs
+  eeros::hal::Output<bool>* enable;
+  
+  // critical inputs
+  eeros::hal::Input<bool>* emergency;
+  eeros::hal::Input<bool>* ready;
+    
+  ControlSystem& cs;
 };
 
 #endif // SMCSAFETYPROPERTIES_HPP_
