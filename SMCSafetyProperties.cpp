@@ -28,7 +28,6 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
       doSystemOn("Switch System on"),
       doSystemOff("Switch System off"),
       startControl("Start Control"),
-      stopControl("Stop Control"),
       startControlDone("Control started"),
       stopControlDone("Control stopped"),
       startMoving("Start moving"),
@@ -58,35 +57,35 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
   addLevel(slPowerOn);
   addLevel(slMoving);
   
-  slOff			.addEvent(doSystemOn,		slSystemOn,		kPublicEvent  );
-  slEmergency		.addEvent(resetEmergency,	slSystemOn,		kPublicEvent  );
-  slSystemOn		.addEvent(startControl,		slStartingControl,	kPublicEvent  );
-  slSystemOn		.addEvent(doSystemOff,		slOff,			kPublicEvent  );
-  slStartingControl	.addEvent(startControlDone,	slPowerOn,		kPrivateEvent );
-  slStoppingControl	.addEvent(stopControlDone,	slOff,			kPrivateEvent );
-  slPowerOn		.addEvent(startMoving,		slMoving,		kPublicEvent  );
-  slMoving		.addEvent(stopMoving,		slPowerOn,		kPublicEvent  );
+  slOff.addEvent(doSystemOn, slSystemOn, kPublicEvent  );
+  slEmergency.addEvent(resetEmergency, slSystemOn, kPublicEvent  );
+  slSystemOn.addEvent(startControl, slStartingControl, kPublicEvent  );
+  slSystemOn.addEvent(doSystemOff, slOff, kPublicEvent  );
+  slStartingControl	.addEvent(startControlDone, slPowerOn, kPrivateEvent );
+  slStoppingControl	.addEvent(stopControlDone, slOff, kPrivateEvent );
+  slPowerOn.addEvent(startMoving, slMoving, kPublicEvent  );
+  slMoving.addEvent(stopMoving, slPowerOn, kPublicEvent  );
   
   // Add events to multiple levels
   addEventToLevelAndAbove(slSystemOn, doEmergency, slEmergency, kPublicEvent);
   addEventToLevelAndAbove(slEmergency, abort, slStoppingControl, kPublicEvent);
     
   // ############ Define input states and events for all levels ############
-  slOff			.setInputActions({ignore(emergency), ignore(ready)});
-  slEmergency		.setInputActions({ignore(emergency), ignore(ready)});
-  slSystemOn		.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
-  slStartingControl	.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
-  slStoppingControl	.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
-  slPowerOn		.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
-  slMoving		.setInputActions({check(emergency, false, doEmergency), check(ready, true, doEmergency)});
+  slOff.setInputActions({ignore(emergency), ignore(ready)});
+  slEmergency.setInputActions({ignore(emergency), ignore(ready)});
+  slSystemOn.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+  slStartingControl.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+  slStoppingControl.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+  slPowerOn.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+  slMoving.setInputActions({check(emergency, false, doEmergency), check(ready, true, doEmergency)});
   
-  slOff			.setOutputActions({set(enable, false)});
-  slEmergency		.setOutputActions({set(enable, false)});
-  slSystemOn		.setOutputActions({set(enable, false)});
-  slStartingControl	.setOutputActions({set(enable, false)});
-  slStoppingControl	.setOutputActions({set(enable, false)});
-  slPowerOn		.setOutputActions({set(enable, true)});
-  slMoving		.setOutputActions({set(enable, true)});
+  slOff.setOutputActions({set(enable, false)});
+  slEmergency.setOutputActions({set(enable, false)});
+  slSystemOn.setOutputActions({set(enable, false)});
+  slStartingControl.setOutputActions({set(enable, false)});
+  slStoppingControl.setOutputActions({set(enable, false)});
+  slPowerOn.setOutputActions({set(enable, true)});
+  slMoving.setOutputActions({set(enable, true)});
   
   // Define and add level functions
   slOff.setLevelAction([&](SafetyContext* privateContext) {
@@ -122,7 +121,13 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
       privateContext->triggerEvent(startMoving);
     }
   });
-    
+
+// //   slMoving.setLevelAction([&](SafetyContext* privateContext) {
+// //     if(ready->get()) {  // check if drive is ready
+// //       privateContext->triggerEvent(startMoving);
+// //     }
+// //   });
+
   // Define entry level
   setEntryLevel(slOff);
   

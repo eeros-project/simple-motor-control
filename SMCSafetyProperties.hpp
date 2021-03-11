@@ -16,7 +16,6 @@ class SMCSafetyProperties : public SafetyProperties {
   SafetyEvent doSystemOn;
   SafetyEvent doSystemOff;
   SafetyEvent startControl;
-  SafetyEvent stopControl;
   SafetyEvent startControlDone;
   SafetyEvent stopControlDone;
   SafetyEvent startMoving;

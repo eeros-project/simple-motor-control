@@ -1,8 +1,3 @@
-#include <iostream>
-#include <ostream>
-#include <fstream>
-#include <stdlib.h>
-#include <unistd.h>
 #include <signal.h>
 
 #include <eeros/hal/HAL.hpp>
@@ -31,7 +26,7 @@ void signalHandler(int signum){
 int main(int argc, char **argv) {  
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger();
-  log.show();
+//   log.show();
   
   log.info() << "Simple Motor Controller Demo started...";
   
@@ -58,6 +53,6 @@ int main(int argc, char **argv) {
   executor.run();
   
   mainSequence.wait();
-  log.info() << "Example finished...";
+  log.info() << "Demo finished...";
   return 0;
 }
