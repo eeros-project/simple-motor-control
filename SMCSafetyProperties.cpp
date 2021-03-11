@@ -122,12 +122,6 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
     }
   });
 
-// //   slMoving.setLevelAction([&](SafetyContext* privateContext) {
-// //     if(ready->get()) {  // check if drive is ready
-// //       privateContext->triggerEvent(startMoving);
-// //     }
-// //   });
-
   // Define entry level
   setEntryLevel(slOff);
   
