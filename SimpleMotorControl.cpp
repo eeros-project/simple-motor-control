@@ -24,44 +24,41 @@ using namespace eeros::sequencer;
 const double dt = 0.001;
 
 void signalHandler(int signum){
-	SafetySystem::exitHandler();
-	Sequencer::instance().abort();
+  SafetySystem::exitHandler();
+  Sequencer::instance().abort();
 }
 
 int main(int argc, char **argv) {
-	signal(SIGINT, signalHandler);
-	
-	StreamLogWriter w(std::cout);
-	Logger::setDefaultWriter(&w);
-	Logger log;
-	w.show();
-	
-	log.info() << "Simple Motor Controller Demo started...";
-	
-	log.info() << "Initializing Hardware...";
-	HAL& hal = HAL::instance();
-	hal.readConfigFromFile(&argc, argv);
-	
-	// Create the control system
-	ControlSystem controlSys(dt);
-	
-	// Create and initialize a safety system
-	SMCSafetyProperties properties(controlSys, dt);
-	SafetySystem safetySys(properties, dt);
-	controlSys.timedomain.registerSafetyEvent(safetySys, properties.doEmergency);
-	
-	auto& sequencer = Sequencer::instance();
-	MainSequence mainSequence("Main Sequence", sequencer, safetySys, properties, controlSys, 3.14/10);
-	sequencer.addSequence(mainSequence);
-	mainSequence.start();
-	
-	auto &executor = Executor::instance();
-	executor.setMainTask(safetySys);
-	safetySys.triggerEvent(properties.doSystemOn);
-	
-	executor.run();
-	
-	mainSequence.waitAndTerminate();
-	log.info() << "Example finished...";
-	return 0;
+  signal(SIGINT, signalHandler);
+  
+  Logger::setDefaultStreamLogger(std::cout);
+  Logger log = Logger::getLogger();
+  
+  log.info() << "Simple Motor Controller Demo started...";
+  
+  log.info() << "Initializing Hardware...";
+  HAL& hal = HAL::instance();
+  hal.readConfigFromFile(&argc, argv);
+  
+  // Create the control system
+  ControlSystem cs(dt);
+  
+  // Create and initialize a safety system
+  SMCSafetyProperties sp(cs, dt);
+  SafetySystem ss(sp, dt);
+  cs.timedomain.registerSafetyEvent(ss, sp.doEmergency);
+  
+  auto& sequencer = Sequencer::instance();
+  MainSequence mainSequence("Main Sequence", sequencer, ss, sp, cs, 3.14/10);
+  mainSequence();
+  
+  auto &executor = Executor::instance();
+  executor.setMainTask(ss);
+  ss.triggerEvent(sp.doSystemOn);
+  
+  executor.run();
+  
+  sequencer.wait();
+  log.info() << "Simple Motor Controller Demo finished...";
+  return 0;
 }
