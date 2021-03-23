@@ -23,10 +23,10 @@ void signalHandler(int signum){
   Sequencer::instance().abort();
 }
 
-int main(int argc, char **argv) {  
+int main(int argc, char **argv) {
+  
   Logger::setDefaultStreamLogger(std::cout);
   Logger log = Logger::getLogger();
-//   log.show();
   
   log.info() << "Simple Motor Controller Demo started...";
   
@@ -50,9 +50,11 @@ int main(int argc, char **argv) {
   auto &executor = Executor::instance();
   executor.setMainTask(ss);
   ss.triggerEvent(sp.doSystemOn);
+  
   executor.run();
   
-  mainSequence.wait();
-  log.info() << "Demo finished...";
+  sequencer.wait();
+  log.info() << "Simple Motor Controller Demo finished...";
+
   return 0;
 }
