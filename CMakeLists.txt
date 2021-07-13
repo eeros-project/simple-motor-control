@@ -5,10 +5,10 @@ project(simpleMotorControl)
 set(CMAKE_CXX_STANDARD 14)
 
 
-set(RECOMMENDED_EEROS_VERSION 1.2)
+set(RECOMMENDED_EEROS_VERSION 1.3)
 set(RECOMMENDED_SIM_EEROS_VERSION 1.0)
 set(RECOMMENDED_FLINK_EEROS_VERSION 1.0)
-set(RECOMMENDED_BBBLUE_EEROS_VERSION 1.2)
+set(RECOMMENDED_BBBLUE_EEROS_VERSION 1.3)
 set(RECOMMENDED_COMEDI_EEROS_VERSION 0.2)
 set(RECOMMENDED_ROS_EEROS_VERSION 1.0)
 
@@ -97,4 +97,6 @@ add_custom_command(OUTPUT copyHalConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E c
 
 add_executable(simpleMotorControl SimpleMotorControl.cpp ControlSystem.cpp SMCSafetyProperties.cpp copyHalConfig)
 target_link_libraries(simpleMotorControl eeros ucl ${CMAKE_DL_LIBS})
+
+install(TARGETS simpleMotorControl DESTINATION bin)
 
