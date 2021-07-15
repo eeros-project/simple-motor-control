@@ -5,6 +5,7 @@
 #include <eeros/control/D.hpp>
 #include <eeros/control/Gain.hpp>
 #include <eeros/control/Constant.hpp>
+#include <eeros/control/Switch.hpp>
 #include <eeros/control/PeripheralInput.hpp>
 #include <eeros/control/PeripheralOutput.hpp>
 #include <eeros/control/TimeDomain.hpp>
@@ -15,16 +16,13 @@ class ControlSystem {
  public:
   ControlSystem(double ts);
   
-  Constant<> setpoint;
+  Constant<> setpoint, initSpeed;
   PeripheralInput<double> enc;
-  D<> diff1;
+  D<> diff1, diff2;
+  Switch<> sw;
   Sum<2> sum1;
-  Gain<> posController;
-  D<> diff2;
   Sum<3> sum2;
-  Gain<> speedController;
-  Gain<> inertia;
-  Gain<> invMotConst;
+  Gain<> posController, speedController, inertia, invMotConst;
   PeripheralOutput<double> dac;
 
   TimeDomain timedomain;

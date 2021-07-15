@@ -8,7 +8,7 @@
 #include <eeros/safety/SafetySystem.hpp>
 #include "SMCSafetyProperties.hpp"
 #include "ControlSystem.hpp"
-
+#include <unistd.h>
 using namespace eeros::sequencer;
 using namespace eeros::safety;
 using namespace eeros::logger;
@@ -25,28 +25,55 @@ class Move : public Step {
   ControlSystem& cs;
 };
 
-class MainSequence : public Sequence {
+class HomingSequence : public Sequence {
  public:
-  MainSequence(std::string name, Sequencer& seq, SafetySystem& safetySys, SMCSafetyProperties& safetyProp, ControlSystem& cs, double angle) 
-     : Sequence(name, seq), ss(safetySys), sp(safetyProp), angle(angle), cs(cs), move("move", this, cs), pause("pause", this) {
-    log.info() << "Sequence created: " << name;
+  HomingSequence(std::string name, Sequence* caller, ControlSystem& cs) 
+     : Sequence(name, caller, true), cs(cs), pause("pause", this) {
   }
   int action() {
-    angle = 0;
-    while(Sequencer::running) {
+    cs.sw.switchToInput(0);
+    pause(5);
+    cs.sw.switchToInput(1);
+    cs.enc.callInputFeature("resetFqd");
+    return 0;
+  }
+ private:
+  ControlSystem& cs;
+  Wait pause;
+};
+
+class MainSequence : public Sequence {
+ public:
+  MainSequence(std::string name, Sequencer& seq, SafetySystem& safetySys, SMCSafetyProperties& safetyProp, ControlSystem& cs) 
+     : Sequence(name, seq), 
+       ss(safetySys), sp(safetyProp), cs(cs), 
+       homingSequence("homing", this, cs), 
+       move("move", this, cs), 
+       pause("pause", this) { }
+  int action() {
+    angle = 0;   
+    diff = 6.28 / 10;
+    while(state == SequenceState::running) {
+      if(ss.getCurrentLevel() == sp.slHoming) {
+        homingSequence();
+        sp.homed = true;
+        ss.triggerEvent(sp.homingDone);
+      }
       if (ss.getCurrentLevel() == sp.slMoving) {
-        angle += 6.28 / 10;
+        angle += diff;
         move(angle);
         pause(1.0);
+        if (angle > 6.28 || angle < 0) diff = -diff;
         log.info() << "pos =  " << cs.enc.getOut().getSignal().getValue();
       }
     }
     return 0;
   }
  private:
+  HomingSequence homingSequence;
   Move move;
   Wait pause;
-  double angle;
+  double angle, diff;
   SafetySystem& ss;
   ControlSystem& cs;
   SMCSafetyProperties& sp;

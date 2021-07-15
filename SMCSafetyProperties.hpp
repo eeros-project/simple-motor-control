@@ -13,12 +13,13 @@ class SMCSafetyProperties : public SafetyProperties {
   SMCSafetyProperties(ControlSystem& controlSys, double ts);
   
   // Define all possible events
-  SafetyEvent doSystemOn;
   SafetyEvent doSystemOff;
   SafetyEvent startControl;
   SafetyEvent startControlDone;
   SafetyEvent stopControlDone;
+  SafetyEvent startHoming;
   SafetyEvent startMoving;
+  SafetyEvent homingDone;
   SafetyEvent stopMoving;
   SafetyEvent doEmergency;
   SafetyEvent resetEmergency;	
@@ -31,7 +32,10 @@ class SMCSafetyProperties : public SafetyProperties {
   SafetyLevel slStartingControl;
   SafetyLevel slStoppingControl;
   SafetyLevel slPowerOn;
+  SafetyLevel slHoming;
   SafetyLevel slMoving;
+  
+  bool homed = false;
   
 private:
   // critical outputs
@@ -40,7 +44,7 @@ private:
   // critical inputs
   eeros::hal::Input<bool>* emergency;
   eeros::hal::Input<bool>* ready;
-    
+  
   ControlSystem& cs;
 };
 

@@ -21,7 +21,7 @@
 		"subdevice2": {
 			"type": "AnalogOut",
 			"channel1": {
-				"signalId": "dac",
+				"signalId": "motor",
 				"scale": [ { "id" : "dac",
 								"minIn": 	-1.0, 	"maxIn": 	1.0,
 								"minOut": 	-8.3, 	"maxOut": 	8.3 }
@@ -30,7 +30,7 @@
 								"minIn":	-0.75, 	"maxIn": 	0.75,
 								"minOut":	-6.0,	"maxOut": 	6.0 }
 					 ],
-				"unit": "A"
+				"unit": "V"
 			}
 		},
 		"subdevice3": {

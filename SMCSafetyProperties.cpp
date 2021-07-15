@@ -23,13 +23,15 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
       slStartingControl("System is starting control system"),
       slStoppingControl("System is stopping control system"),
       slPowerOn("Power is on, motors are controlled"),
+      slHoming("System is homing"),
       slMoving("System is moving"),
       
-      doSystemOn("Switch System on"),
       doSystemOff("Switch System off"),
       startControl("Start Control"),
       startControlDone("Control started"),
       stopControlDone("Control stopped"),
+      startHoming("Start homing"),
+      homingDone("Homing done"),
       startMoving("Start moving"),
       stopMoving("Stop moving"),
       doEmergency("Emergency"),
@@ -55,15 +57,17 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
   addLevel(slStartingControl);
   addLevel(slStoppingControl);
   addLevel(slPowerOn);
+  addLevel(slHoming);
   addLevel(slMoving);
   
-  slOff.addEvent(doSystemOn, slSystemOn, kPublicEvent  );
   slEmergency.addEvent(resetEmergency, slSystemOn, kPublicEvent  );
   slSystemOn.addEvent(startControl, slStartingControl, kPublicEvent  );
   slSystemOn.addEvent(doSystemOff, slOff, kPublicEvent  );
   slStartingControl	.addEvent(startControlDone, slPowerOn, kPrivateEvent );
   slStoppingControl	.addEvent(stopControlDone, slOff, kPrivateEvent );
+  slPowerOn.addEvent(startHoming, slHoming, kPublicEvent  );
   slPowerOn.addEvent(startMoving, slMoving, kPublicEvent  );
+  slHoming.addEvent(homingDone, slMoving, kPublicEvent  );
   slMoving.addEvent(stopMoving, slPowerOn, kPublicEvent  );
   
   // Add events to multiple levels
@@ -77,6 +81,7 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
   slStartingControl.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
   slStoppingControl.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
   slPowerOn.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
+  slHoming.setInputActions({check(emergency, false, doEmergency), check(ready, true, doEmergency)});
   slMoving.setInputActions({check(emergency, false, doEmergency), check(ready, true, doEmergency)});
   
   slOff.setOutputActions({set(enable, false)});
@@ -85,6 +90,7 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
   slStartingControl.setOutputActions({set(enable, false)});
   slStoppingControl.setOutputActions({set(enable, false)});
   slPowerOn.setOutputActions({set(enable, true)});
+  slHoming.setOutputActions({set(enable, true)});
   slMoving.setOutputActions({set(enable, true)});
   
   // Define and add level functions
@@ -118,12 +124,13 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
   
   slPowerOn.setLevelAction([&](SafetyContext* privateContext) {
     if(ready->get()) {	// check if drive is ready
-      privateContext->triggerEvent(startMoving);
+      if(!homed) privateContext->triggerEvent(startHoming);
+      else privateContext->triggerEvent(startMoving);
     }
   });
 
   // Define entry level
-  setEntryLevel(slOff);
+  setEntryLevel(slSystemOn);
   
   exitFunction = ([&](SafetyContext* privateContext){
     privateContext->triggerEvent(abort);

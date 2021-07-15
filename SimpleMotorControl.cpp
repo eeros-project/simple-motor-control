@@ -44,12 +44,11 @@ int main(int argc, char **argv) {
   signal(SIGINT, signalHandler);
   
   auto& sequencer = Sequencer::instance();
-  MainSequence mainSequence("Main Sequence", sequencer, ss, sp, cs, 3.14/10);
+  MainSequence mainSequence("Main Sequence", sequencer, ss, sp, cs);
   mainSequence();
   
   auto &executor = Executor::instance();
   executor.setMainTask(ss);
-  ss.triggerEvent(sp.doSystemOn);
   
   executor.run();
   
