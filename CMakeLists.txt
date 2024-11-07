@@ -93,7 +93,7 @@ endif(USE_ROS)
 add_custom_command(OUTPUT copyHalConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${simpleMotorControl_SOURCE_DIR}/*.json" "${simpleMotorControl_BINARY_DIR}")
 
 add_executable(simpleMotorControl SimpleMotorControl.cpp ControlSystem.cpp SMCSafetyProperties.cpp copyHalConfig)
-target_link_libraries(simpleMotorControl PRIVATE eeros)
+target_link_libraries(simpleMotorControl PRIVATE EEROS::eeros)
 
 install(TARGETS simpleMotorControl DESTINATION bin)
 
