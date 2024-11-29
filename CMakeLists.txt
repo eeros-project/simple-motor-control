@@ -17,7 +17,7 @@ if(USE_COMEDI)
   find_package(comedi-eeros 0.2 REQUIRED)
 endif(USE_COMEDI)
 
-add_custom_command(OUTPUT copyHalConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${simpleMotorControl_SOURCE_DIR}/*.json" "${simpleMotorControl_BINARY_DIR}")
+add_custom_command(OUTPUT copyHalConfig POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${${PROJECT_NAME}_SOURCE_DIR}/*.json" "${${PROJECT_NAME}_BINARY_DIR}")
 
 add_executable(${PROJECT_NAME} SimpleMotorControl.cpp ControlSystem.cpp SMCSafetyProperties.cpp copyHalConfig)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)
