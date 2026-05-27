@@ -47,9 +47,9 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
   
   // ############ Define critical inputs ############
   emergency = hal.getLogicInput("emergency");
-  ready = hal.getLogicInput("readySig1");
+  ready = hal.getLogicInput("ready");
   
-  criticalInputs = { emergency, ready };
+  criticalInputs = { emergency };
   
   addLevel(slOff);
   addLevel(slEmergency);
@@ -63,8 +63,8 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
   slEmergency.addEvent(resetEmergency, slSystemOn, kPublicEvent  );
   slSystemOn.addEvent(startControl, slStartingControl, kPublicEvent  );
   slSystemOn.addEvent(doSystemOff, slOff, kPublicEvent  );
-  slStartingControl	.addEvent(startControlDone, slPowerOn, kPrivateEvent );
-  slStoppingControl	.addEvent(stopControlDone, slOff, kPrivateEvent );
+  slStartingControl.addEvent(startControlDone, slPowerOn, kPrivateEvent );
+  slStoppingControl.addEvent(stopControlDone, slOff, kPrivateEvent );
   slPowerOn.addEvent(startHoming, slHoming, kPublicEvent  );
   slPowerOn.addEvent(startMoving, slMoving, kPublicEvent  );
   slHoming.addEvent(homingDone, slMoving, kPublicEvent  );
@@ -75,14 +75,14 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
   addEventToLevelAndAbove(slEmergency, abort, slStoppingControl, kPublicEvent);
     
   // ############ Define input states and events for all levels ############
-  slOff.setInputActions({ignore(emergency), ignore(ready)});
-  slEmergency.setInputActions({ignore(emergency), ignore(ready)});
-  slSystemOn.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
-  slStartingControl.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
-  slStoppingControl.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
-  slPowerOn.setInputActions({check(emergency, false, doEmergency), ignore(ready)});
-  slHoming.setInputActions({check(emergency, false, doEmergency), check(ready, true, doEmergency)});
-  slMoving.setInputActions({check(emergency, false, doEmergency), check(ready, true, doEmergency)});
+  slOff.setInputActions({ignore(emergency)});
+  slEmergency.setInputActions({ignore(emergency)});
+  slSystemOn.setInputActions({check(emergency, false, doEmergency)});
+  slStartingControl.setInputActions({check(emergency, false, doEmergency)});
+  slStoppingControl.setInputActions({check(emergency, false, doEmergency)});
+  slPowerOn.setInputActions({check(emergency, false, doEmergency)});
+  slHoming.setInputActions({check(emergency, false, doEmergency)});
+  slMoving.setInputActions({check(emergency, false, doEmergency)});
   
   slOff.setOutputActions({set(enable, false)});
   slEmergency.setOutputActions({set(enable, false)});
@@ -126,6 +126,12 @@ SMCSafetyProperties::SMCSafetyProperties(ControlSystem& cs, double dt)
     if(ready->get()) {	// check if drive is ready
       if(!homed) privateContext->triggerEvent(startHoming);
       else privateContext->triggerEvent(startMoving);
+    }
+  });
+
+  slMoving.setLevelAction([&](SafetyContext* privateContext) {
+    if(!ready->get()) {	// check if drive is no longer ready
+      privateContext->triggerEvent(stopMoving);
     }
   });
 

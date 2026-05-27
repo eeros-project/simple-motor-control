@@ -32,6 +32,7 @@ class HomingSequence : public Sequence {
   }
   int action() {
     cs.sw.switchToInput(0);
+    cs.initSpeed.setValue(2 * M_PI);
     pause(5);
     cs.sw.switchToInput(1);
     cs.enc.callInputFeature("resetFqd");
@@ -66,6 +67,7 @@ class MainSequence : public Sequence {
         if (angle > 6.28 || angle < 0) diff = -diff;
         log.info() << "pos =  " << cs.enc.getOut().getSignal().getValue();
       }
+      pause(0.5);
     }
     return 0;
   }
