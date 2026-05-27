@@ -6,7 +6,7 @@ const double dampingFactor = 0.9;
 
 ControlSystem::ControlSystem(double ts) 
     : setpoint(0.0),
-      initSpeed(5),
+      initSpeed(0.0),
       enc("q", false),
       sw(0),
       posController(2 * M_PI / (ts * 20) / (2 * dampingFactor)),	// 174.5
@@ -17,7 +17,7 @@ ControlSystem::ControlSystem(double ts)
       timedomain("Main time domain", ts, true) {
   
   setpoint.getOut().getSignal().setName("phi desired");
-  setpoint.getOut().getSignal().setName("init speed");
+  initSpeed.getOut().getSignal().setName("init speed");
   enc.getOut().getSignal().setName("phi actual");
   sum1.negateInput(1);
   sum1.getOut().getSignal().setName("phi error");	
